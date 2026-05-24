@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechMNHub | Session Intelligence Portal</title>
+  <!-- Load dynamic config from .env -->
+  <script src="/config.js"></script>
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #0D0D0D;
+      --bg-card: rgba(17, 17, 17, 0.85);
+      --border-cyber: rgba(212, 175, 55, 0.2);
+      --border-cyber-active: rgba(212, 175, 55, 0.45);
+      --color-gold: #D4AF37;
+      --color-gold-glow: rgba(212, 175, 55, 0.25);
+      --color-cyan: #00E5FF;
+      --color-cyan-glow: rgba(0, 229, 255, 0.25);
+      --color-pink: #FF007F;
+      --color-pink-glow: rgba(255, 0, 127, 0.25);
+      --color-red: #FF3B30;
+      --color-orange: #FF9F0A;
+      --color-orange-glow: rgba(255, 159, 10, 0.25);
+      --color-text-muted: #A0A0A0;
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Shift Gradients & Drift Orbs matching Ambassador Portal exactly */
+    .tmh-animated-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(950px 620px at 12% 14%, rgba(212, 175, 55, 0.06), rgba(212, 175, 55, 0.03) 38%, transparent 72%),
+        radial-gradient(860px 560px at 88% 84%, rgba(212, 175, 55, 0.05), rgba(212, 175, 55, 0.02) 42%, transparent 74%),
+        radial-gradient(640px 460px at 52% 20%, rgba(212, 175, 55, 0.03), transparent 70%),
+        linear-gradient(180deg, rgba(13, 13, 13, 0.985), rgba(13, 13, 13, 0.965));
+      will-change: opacity;
+      z-index: 0;
+      animation: ambientShift 18s ease-in-out infinite;
+    }
+
+    @keyframes ambientShift {
+      0%, 100% { opacity: 0.94; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.012); }
+    }
+
+    .tmh-depth-layer {
+      position: fixed;
+      pointer-events: none;
+      filter: blur(88px);
+      will-change: transform, opacity;
+      z-index: 0;
+      opacity: 0.34;
+    }
+
+    .tmh-depth-layer-a {
+      left: -10vw;
+      top: -8vh;
+      width: 42vw;
+      height: 34vw;
+      background: radial-gradient(circle at 34% 36%, rgba(212, 175, 55, 0.17), rgba(212, 175, 55, 0.05) 48%, transparent 78%);
+      animation: driftA 20s ease-in-out infinite;
+    }
+
+    .tmh-depth-layer-b {
+      right: -16vw;
+      bottom: -12vh;
+      width: 50vw;
+      height: 36vw;
+      background: radial-gradient(circle at 64% 58%, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.04) 52%, transparent 80%);
+      animation: driftB 22s ease-in-out infinite;
+    }
+
+    @keyframes driftA {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.24; }
+      50% { transform: translate(14px, -10px) scale(1.035); opacity: 0.34; }
+    }
+
+    @keyframes driftB {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.22; }
+      50% { transform: translate(-16px, 12px) scale(1.04); opacity: 0.32; }
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* Glassmorphic Cyber Header */
+    header {
+      background: rgba(17, 17, 17, 0.65);
+      border: 1px solid var(--border-cyber);
+      border-radius: 24px;
+      padding: 1.5rem 2rem;
+      backdrop-filter: blur(12px);
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      animation: tmhFieldReveal 0.6s ease forwards;
+    }
+
+    @keyframes tmhFieldReveal {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--color-gold);
+      box-shadow: 0 0 18px var(--color-gold-glow);
+      color: var(--color-gold);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #ffffff 0%, #E2C258 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+      font-weight: 700;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn-global-reset {
+      background: linear-gradient(135deg, #FF3B30 0%, #A31D1D 100%);
+      color: white;
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);
+    }
+
+    .btn-global-reset:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 25px rgba(255, 59, 48, 0.45);
+      border-color: #FF3B30;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyber);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 140px;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-cyber-active);
+      box-shadow: 0 0 28px rgba(212, 175, 55, 0.16);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-gold-glow) 0%, transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .stat-card.stat-cyan::after {
+      background: radial-gradient(circle, var(--color-cyan-glow) 0%, transparent 70%);
+    }
+
+    .stat-card.stat-pink::after {
+      background: radial-gradient(circle, var(--color-pink-glow) 0%, transparent 70%);
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--color-text-muted);
+      font-weight: 700;
+      margin-top: 0.75rem;
+    }
+
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .stat-pulse {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-gold);
+      box-shadow: 0 0 10px var(--color-gold);
+      animation: pulseGold 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseGold {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0.5; }
+    }
+
+    .stat-card.stat-orange::after {
+      background: radial-gradient(circle, var(--color-orange-glow) 0%, transparent 70%);
+    }
+
+    .stat-pulse-orange {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-orange);
+      box-shadow: 0 0 10px var(--color-orange);
+      animation: pulseOrange 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseOrange {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0.5; }
+    }
+
+    /* Controls Bar */
+    .controls-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyber);
+      border-radius: 20px;
+      padding: 1.25rem 1.5rem;
+      backdrop-filter: blur(12px);
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-cyber);
+      color: #ffffff;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-gold);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+    }
+
+    .tab-toggles {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(212, 175, 55, 0.15);
+      color: var(--color-gold);
+      border: 1px solid var(--border-cyber);
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .session-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyber);
+      border-radius: 24px;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .session-card:hover {
+      transform: translateY(-5px) scale(1.01);
+      border-color: var(--border-cyber-active);
+      box-shadow: 0 12px 30px rgba(212, 175, 55, 0.12);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 1rem;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .role-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid transparent;
+    }
+
+    .role-student {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: rgba(212, 175, 55, 0.25);
+      color: var(--color-gold);
+    }
+
+    .role-institute {
+      background: rgba(255, 0, 127, 0.12);
+      border-color: rgba(255, 0, 127, 0.25);
+      color: var(--color-pink);
+    }
+
+    .role-admin {
+      background: rgba(0, 229, 255, 0.12);
+      border-color: rgba(0, 229, 255, 0.25);
+      color: var(--color-cyan);
+    }
+
+    .user-info {
+      min-width: 0;
+    }
+
+    .user-id {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .role-badge {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-top: 2px;
+      display: inline-block;
+    }
+
+    .badge-student { color: var(--color-gold); }
+    .badge-institute { color: var(--color-pink); }
+    .badge-admin { color: var(--color-cyan); }
+
+    .pulse-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-gold);
+    }
+
+    .card-body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .info-icon {
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .info-label {
+      color: var(--color-text-muted);
+      width: 75px;
+      flex-shrink: 0;
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: #ffffff;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .btn-terminate {
+      width: 100%;
+      background: rgba(255, 59, 48, 0.08);
+      border: 1px solid rgba(255, 59, 48, 0.2);
+      color: #FF3B30;
+      padding: 0.75rem;
+      border-radius: 999px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-terminate:hover {
+      background: rgba(255, 59, 48, 0.18);
+      border-color: #FF3B30;
+      box-shadow: 0 4px 15px rgba(255, 59, 48, 0.15);
+    }
+
+    /* History / Audit Ledger View */
+    .ledger-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-cyber);
+      border-radius: 24px;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .ledger-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 1rem;
+    }
+
+    .ledger-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #D4AF37 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ledger-scroll {
+      max-height: 550px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .ledger-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .ledger-scroll::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+    }
+    .ledger-scroll::-webkit-scrollbar-thumb {
+      background: var(--border-cyber);
+      border-radius: 10px;
+    }
+    .ledger-scroll::-webkit-scrollbar-thumb:hover {
+      background: var(--color-gold);
+    }
+
+    .ledger-item {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 1fr 1fr 1.5fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .ledger-item:hover {
+      border-color: var(--border-cyber);
+      background: rgba(212, 175, 55, 0.03);
+    }
+
+    .ledger-identity {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .ledger-icon-wrap {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ledger-details {
+      min-width: 0;
+    }
+
+    .ledger-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ledger-meta {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      margin-top: 1px;
+    }
+
+    .ledger-gateway {
+      font-size: 0.8rem;
+      color: #dddddd;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    .ledger-operator {
+      font-size: 0.78rem;
+      color: var(--color-gold);
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ledger-time {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+    .ledger-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .status-revoked-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255, 59, 48, 0.15);
+      border: 1px solid rgba(255, 59, 48, 0.25);
+      color: #FF3B30;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-expired-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-muted);
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Empty states and banners */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      color: var(--color-text-muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-icon {
+      color: var(--border-cyber);
+      margin-bottom: 1rem;
+    }
+
+    .notice-banner {
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--color-gold);
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      animation: slideDown 0.3s ease;
+      box-shadow: 0 0 18px var(--color-gold-glow);
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .ledger-item {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+      .ledger-gateway, .ledger-operator, .ledger-status {
+        text-align: right;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Premium animated depth backgrounds exactly matching Ambassador Portal -->
+  <div aria-hidden="true" class="tmh-animated-bg"></div>
+  <div aria-hidden="true" class="tmh-depth-layer tmh-depth-layer-a"></div>
+  <div aria-hidden="true" class="tmh-depth-layer tmh-depth-layer-b"></div>
+
+  <div class="app-container">
+    
+    <!-- Premium Header -->
+    <header>
+      <div class="brand-wrap">
+        <div class="logo-container">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M12 8v4M12 16h.01"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Visionary Flow</h1>
+          <p>Session Intelligence Terminal</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button type="button" class="btn-global-reset" onclick="terminateAllSessions()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+          </svg>
+          Global Revoke
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      
+      <div class="stat-card">
+        <div class="stat-icon" style="color: var(--color-gold);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-label">Live Heartbeats</div>
+          <div class="stat-value" id="stat-active">0 <span class="stat-pulse"></span></div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-orange">
+        <div class="stat-icon" style="color: var(--color-orange);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-label">Tab Closed / Idle</div>
+          <div class="stat-value" id="stat-idle" style="color: var(--color-orange);">0 <span class="stat-pulse-orange"></span></div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-cyan">
+        <div class="stat-icon" style="color: var(--color-cyan);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-label">Students Online</div>
+          <div class="stat-value" id="stat-students" style="color: var(--color-gold);">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card stat-pink">
+        <div class="stat-icon" style="color: var(--color-pink);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10v6M12 2v20M2 10l10-8 10 8"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-label">Institutes Live</div>
+          <div class="stat-value" id="stat-institutes" style="color: var(--color-pink);">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="color: #FF3B30;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="stat-label">Revoked Keys</div>
+          <div class="stat-value" id="stat-revoked" style="color: #FF3B30;">0</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Active Notice Banner -->
+    <div id="notice-container"></div>
+
+    <!-- Console Main Box -->
+    <div class="console-wrapper">
+      
+      <!-- Controls Panel -->
+      <div class="controls-bar">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" class="search-input" id="search-input" placeholder="Search by User ID, IP, or Browser..." oninput="handleSearch()">
+        </div>
+
+        <div class="tab-toggles">
+          <button type="button" class="tab-btn active" id="tab-active" onclick="switchTab('active')">Active Sessions</button>
+          <button type="button" class="tab-btn" id="tab-ledger" onclick="switchTab('ledger')">Revocation Ledger</button>
+          <button type="button" class="tab-btn" id="tab-traffic" onclick="switchTab('traffic')">Traffic Controls</button>
+        </div>
+      </div>
+
+      <!-- Live Terminal Grid -->
+      <div id="live-terminal" class="tab-content">
+        <div class="cards-grid" id="active-sessions-container">
+          <!-- Active sessions inject here -->
+        </div>
+      </div>
+
+      <!-- History Ledger list -->
+      <div id="ledger-terminal" class="tab-content" style="display: none;">
+        <div class="ledger-wrapper">
+          <div class="ledger-header">
+            <h2 class="ledger-title">Security Audits</h2>
+            <span style="color: var(--color-gold); background: rgba(212,175,55,0.08); padding: 4px 10px; border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Immutable Logs</span>
+          </div>
+
+          <div class="ledger-scroll">
+            <div id="history-sessions-container">
+              <!-- Revoked sessions inject here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Traffic Control Panel -->
+      <div id="traffic-terminal" class="tab-content" style="display: none;">
+        <div class="ledger-wrapper">
+          <div class="ledger-header">
+            <h2 class="ledger-title" style="background: linear-gradient(135deg, #ffffff 0%, var(--color-orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Traffic Restriction Filters</h2>
+            <button type="button" class="btn-global-reset" style="background: linear-gradient(135deg, var(--color-orange) 0%, #C77000 100%); border-color: rgba(255, 159, 10, 0.3); box-shadow: 0 4px 15px rgba(255, 159, 10, 0.2);" onclick="toggleBanForm()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Add Restriction
+            </button>
+          </div>
+
+          <!-- Add Restriction Form -->
+          <div id="ban-form-container" style="display: none; background: rgba(0, 0, 0, 0.4); border: 1px dashed var(--border-cyber); border-radius: 16px; padding: 1.25rem; margin-bottom: 1.5rem; animation: slideDown 0.3s ease;">
+            <h3 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--color-orange); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Deploy Security Traffic Filter
+            </h3>
+            <form id="ban-form" onsubmit="submitBan(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+              <div>
+                <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Filter Target Key</label>
+                <input type="text" id="ban-filter-key" required placeholder="e.g. 192.168.1.1 or user@domain.com" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+              </div>
+              <div>
+                <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Filter Type</label>
+                <select id="ban-filter-type" required style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                  <option value="ip" style="background: #000;">IP Address</option>
+                  <option value="email" style="background: #000;">Email Address</option>
+                  <option value="user" style="background: #000;">User Account ID</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Operational Note</label>
+                <input type="text" id="ban-log-note" placeholder="Reason for restriction..." style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="tab-btn active" style="flex: 1; height: 38px; background: rgba(255, 159, 10, 0.15); border-color: rgba(255, 159, 10, 0.35); color: var(--color-orange);">Deploy</button>
+                <button type="button" class="tab-btn" onclick="toggleBanForm()" style="height: 38px;">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="ledger-scroll">
+            <div id="bans-container">
+              <!-- Bans list inject here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let activeTab = 'active';
+    let liveSessions = [];
+    let historySessions = [];
+    let activeBans = [];
+    let filterQuery = '';
+    const API_BASE = window.SESSION_API_BASE || 'http://localhost:5001/api';
+
+    // Automatic polling loop
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchData();
+      setInterval(fetchData, 4500); // 4.5 seconds live polling
+    });
+
+    async function fetchData() {
+      try {
+        const fetchPromises = [
+          fetch(`${API_BASE}/sessions/live`).then(r => r.json()),
+          fetch(`${API_BASE}/sessions/history`).then(r => r.json())
+        ];
+
+        if (activeTab === 'traffic') {
+          fetchPromises.push(fetch(`${API_BASE}/sessions/bans`).then(r => r.json()));
+        }
+
+        const results = await Promise.all(fetchPromises);
+        const liveRes = results[0];
+        const historyRes = results[1];
+        const bansRes = results[2];
+
+        if (liveRes && liveRes.ok) {
+          liveSessions = liveRes.sessions || [];
+          updateStats();
+          if (activeTab === 'active') {
+            renderActiveSessions();
+          }
+        }
+
+        if (historyRes && historyRes.ok) {
+          historySessions = historyRes.sessions || [];
+          if (activeTab === 'ledger') {
+            renderHistoryLedger();
+          }
+        }
+
+        if (bansRes && bansRes.ok) {
+          activeBans = bansRes.filters || [];
+          if (activeTab === 'traffic') {
+            renderBansList();
+          }
+        }
+      } catch (err) {
+        console.error("Presence API connection error:", err);
+      }
+    }
+
+    function updateStats() {
+      const totalSessions = liveSessions.length;
+      
+      const now = Date.now();
+      const activeSessionsList = liveSessions.filter(s => (now - new Date(s.lastSeen).getTime()) < 90000);
+      const idleSessionsList = liveSessions.filter(s => (now - new Date(s.lastSeen).getTime()) >= 90000);
+
+      document.getElementById('stat-active').innerHTML = `${activeSessionsList.length} <span class="stat-pulse"></span>`;
+      document.getElementById('stat-idle').innerHTML = `${idleSessionsList.length} <span class="stat-pulse-orange"></span>`;
+      
+      const studentCount = liveSessions.filter(s => s.role === 'student').length;
+      document.getElementById('stat-students').innerText = studentCount;
+
+      const instituteCount = liveSessions.filter(s => s.role === 'institute').length;
+      document.getElementById('stat-institutes').innerText = instituteCount;
+
+      const revokedCount = historySessions.filter(s => s.revoked).length;
+      document.getElementById('stat-revoked').innerText = revokedCount;
+    }
+
+    async function switchTab(tabKey) {
+      activeTab = tabKey;
+      document.getElementById('tab-active').classList.toggle('active', tabKey === 'active');
+      document.getElementById('tab-ledger').classList.toggle('active', tabKey === 'ledger');
+      document.getElementById('tab-traffic').classList.toggle('active', tabKey === 'traffic');
+      
+      document.getElementById('live-terminal').style.display = tabKey === 'active' ? 'block' : 'none';
+      document.getElementById('ledger-terminal').style.display = tabKey === 'ledger' ? 'block' : 'none';
+      document.getElementById('traffic-terminal').style.display = tabKey === 'traffic' ? 'block' : 'none';
+
+      if (tabKey === 'active') {
+        renderActiveSessions();
+      } else if (tabKey === 'ledger') {
+        renderHistoryLedger();
+      } else if (tabKey === 'traffic') {
+        await fetchBans();
+      }
+    }
+
+    async function fetchBans() {
+      try {
+        const res = await fetch(`${API_BASE}/sessions/bans`);
+        const data = await res.json();
+        if (res.ok) {
+          activeBans = data.filters || [];
+          renderBansList();
+        }
+      } catch (err) {
+        console.error("Failed to load restriction filters", err);
+      }
+    }
+
+    function handleSearch() {
+      filterQuery = document.getElementById('search-input').value.toLowerCase().trim();
+      if (activeTab === 'active') renderActiveSessions();
+      else if (activeTab === 'ledger') renderHistoryLedger();
+      else if (activeTab === 'traffic') renderBansList();
+    }
+
+    function showBannerNotice(message) {
+      const container = document.getElementById('notice-container');
+      container.innerHTML = `
+        <div class="notice-banner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          <span>${message}</span>
+        </div>
+      `;
+      setTimeout(() => { container.innerHTML = ''; }, 4000);
+    }
+
+    // Helper to get styled device icon
+    function getDeviceDetails(userAgentString) {
+      const ua = userAgentString || '';
+      let os = 'Unknown OS';
+      let browser = 'Unknown Browser';
+
+      if (ua.includes('Windows')) os = 'Windows';
+      else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'Mac OS';
+      else if (ua.includes('Android')) os = 'Android';
+      else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+      else if (ua.includes('Linux')) os = 'Linux';
+
+      if (ua.includes('Chrome') && !ua.includes('Chromium')) browser = 'Chrome';
+      else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+      else if (ua.includes('Firefox')) browser = 'Firefox';
+      else if (ua.includes('Edge')) browser = 'Edge';
+      else if (ua.includes('Opera')) browser = 'Opera';
+
+      return { os, browser };
+    }
+
+    function renderActiveSessions() {
+      const container = document.getElementById('active-sessions-container');
+      container.innerHTML = '';
+
+      const filtered = liveSessions.filter(s => {
+        if (!filterQuery) return true;
+        const details = getDeviceDetails(s.userAgent);
+        return (s.userId || '').toLowerCase().includes(filterQuery) ||
+               ((s.metadata && s.metadata.operatorName) || '').toLowerCase().includes(filterQuery) ||
+               (s.ipAddress || '').toLowerCase().includes(filterQuery) ||
+               (s.role || '').toLowerCase().includes(filterQuery) ||
+               (s.deviceLabel || '').toLowerCase().includes(filterQuery) ||
+               details.os.toLowerCase().includes(filterQuery) ||
+               details.browser.toLowerCase().includes(filterQuery);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+            </div>
+            <p>No active sessions match the current console filters.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(session => {
+        const details = getDeviceDetails(session.userAgent);
+        const relativeTime = getRelativeTime(session.createdAt);
+        const lastSeenTime = getRelativeTime(session.lastSeen);
+        const isIdle = (Date.now() - new Date(session.lastSeen).getTime()) >= 90000;
+        
+        let roleLabel = 'Student';
+        let roleClass = 'role-student';
+        let badgeClass = 'badge-student';
+        let avatarIcon = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        `;
+
+        if (session.role === 'admin') {
+          roleLabel = 'Admin';
+          roleClass = 'role-admin';
+          badgeClass = 'badge-admin';
+          avatarIcon = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          `;
+        } else if (session.role === 'institute') {
+          roleLabel = 'Institute';
+          roleClass = 'role-institute';
+          badgeClass = 'badge-institute';
+          avatarIcon = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10v6M12 2v20M2 10l10-8 10 8"/>
+            </svg>
+          `;
+        }
+
+        const pulseIndicator = isIdle 
+          ? `<span class="stat-pulse-orange"></span> Idle / Closed`
+          : `<span class="stat-pulse"></span> Active`;
+
+        const operatorName = (session.metadata && session.metadata.operatorName)
+          ? String(session.metadata.operatorName)
+          : 'N/A';
+
+        const card = document.createElement('div');
+        card.className = 'session-card';
+        if (isIdle) {
+          card.style.borderColor = 'rgba(255, 159, 10, 0.2)';
+        }
+
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="user-profile">
+              <div class="role-avatar ${roleClass}">
+                ${avatarIcon}
+              </div>
+              <div class="user-info">
+                <h4 class="user-id" title="${session.userId}">${session.userId}</h4>
+                ${session.metadata && session.metadata.operatorName ? `<div style="font-size: 0.75rem; color: var(--color-gold); font-weight: 600; margin-top: 2px;">👤 ${session.metadata.operatorName}</div>` : ''}
+                <span class="role-badge ${badgeClass}">${roleLabel}</span>
+              </div>
+            </div>
+            <div class="pulse-indicator" style="color: ${isIdle ? 'var(--color-orange)' : 'var(--color-gold)'};">
+              ${pulseIndicator}
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <span class="info-label">Platform</span>
+              <span class="info-value">${details.os} (${details.browser})</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+              </span>
+              <span class="info-label">IP Gateway</span>
+              <span class="info-value" style="color: var(--color-cyan);">${session.ipAddress || '127.0.0.1'}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </span>
+              <span class="info-label">Logged In</span>
+              <span class="info-value">${relativeTime}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </span>
+              <span class="info-label">Last Touch</span>
+              <span class="info-value" style="color: ${isIdle ? 'var(--color-orange)' : '#ffffff'}">${lastSeenTime}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+              </span>
+              <span class="info-label">Session ID</span>
+              <span class="info-value" style="font-family: monospace; font-size: 0.7rem; color: var(--color-gold);">${session.sessionId}</span>
+            </div>
+
+            <div class="info-row">
+              <span class="info-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <span class="info-label">Operator</span>
+              <span class="info-value" style="color: var(--color-gold); font-weight: 700;">${operatorName}</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+            <button type="button" class="btn-terminate" style="flex: 1; font-size: 0.75rem; padding: 0.55rem 0.25rem;" onclick="terminateSession('${session.sessionId}')">Revoke</button>
+            ${session.role !== 'admin' ? `
+              <button type="button" class="btn-terminate" style="flex: 1; font-size: 0.75rem; padding: 0.55rem 0.25rem; background: rgba(255, 159, 10, 0.08); border-color: rgba(255, 159, 10, 0.2); color: var(--color-orange);" onclick="banUser('${session.userId}', '${session.ipAddress}')">Ban</button>
+              <button type="button" class="btn-terminate" style="flex: 1; font-size: 0.75rem; padding: 0.55rem 0.25rem; background: rgba(255, 59, 48, 0.08); border-color: rgba(255, 59, 48, 0.2); color: #FF3B30;" onclick="purgeUser('${session.userId}', '${session.role}')">Purge</button>
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderHistoryLedger() {
+      const container = document.getElementById('history-sessions-container');
+      container.innerHTML = '';
+
+      const filtered = historySessions.filter(s => {
+        if (!filterQuery) return true;
+        const details = getDeviceDetails(s.userAgent);
+        return (s.userId || '').toLowerCase().includes(filterQuery) ||
+               ((s.metadata && s.metadata.operatorName) || '').toLowerCase().includes(filterQuery) ||
+               (s.ipAddress || '').toLowerCase().includes(filterQuery) ||
+               (s.role || '').toLowerCase().includes(filterQuery) ||
+               (s.deviceLabel || '').toLowerCase().includes(filterQuery) ||
+               (s.revokeReason || '').toLowerCase().includes(filterQuery) ||
+               details.os.toLowerCase().includes(filterQuery) ||
+               details.browser.toLowerCase().includes(filterQuery);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <line x1="10" y1="9" x2="8" y2="9"/>
+              </svg>
+            </div>
+            <p>No historical security records available.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(session => {
+        const details = getDeviceDetails(session.userAgent);
+        const revokedTime = session.revokedAt ? getRelativeTime(session.revokedAt) : 'Recently';
+        
+        let roleClass = 'role-student';
+        let bgStyle = 'rgba(212, 175, 55, 0.12)';
+        let borderStyle = 'rgba(212, 175, 55, 0.25)';
+        let avatarIcon = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        `;
+
+        if (session.role === 'admin') {
+          roleClass = 'role-admin';
+          bgStyle = 'rgba(0, 229, 255, 0.12)';
+          borderStyle = 'rgba(0, 229, 255, 0.25)';
+          avatarIcon = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            </svg>
+          `;
+        } else if (session.role === 'institute') {
+          roleClass = 'role-institute';
+          bgStyle = 'rgba(255, 0, 127, 0.12)';
+          borderStyle = 'rgba(255, 0, 127, 0.25)';
+          avatarIcon = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 10v6M2 10v6M12 2v20M2 10l10-8 10 8"/>
+            </svg>
+          `;
+        }
+
+        const item = document.createElement('div');
+        item.className = 'ledger-item';
+        item.innerHTML = `
+          <div class="ledger-identity">
+            <div class="ledger-icon-wrap" style="background: ${bgStyle}; border: 1px solid ${borderStyle}; color: #ffffff;">
+              ${avatarIcon}
+            </div>
+            <div class="ledger-details">
+              <div class="ledger-name text-white" title="${session.userId}">${session.userId}${session.metadata && session.metadata.operatorName ? ` (${session.metadata.operatorName})` : ''}</div>
+              <div class="ledger-meta">${session.role.toUpperCase()} • ${details.os} (${details.browser})</div>
+            </div>
+          </div>
+          <div class="ledger-operator" title="Operator Name">${(session.metadata && session.metadata.operatorName) ? session.metadata.operatorName : 'N/A'}</div>
+          <div class="ledger-gateway" style="font-family: monospace;">${session.ipAddress || '127.0.0.1'}</div>
+          <div class="ledger-time">${revokedTime}</div>
+          <div class="ledger-status">
+            ${session.revoked 
+              ? `<span class="status-revoked-badge" title="${session.revokeReason || 'Session Revoked'}">${session.revokeReason ? session.revokeReason.slice(0, 24) : 'Revoked'}</span>` 
+              : `<span class="status-expired-badge">Expired</span>`
+            }
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderBansList() {
+      const container = document.getElementById('bans-container');
+      container.innerHTML = '';
+
+      const filtered = activeBans.filter(b => {
+        if (!filterQuery) return true;
+        return (b.filterKey || '').toLowerCase().includes(filterQuery) ||
+               (b.filterType || '').toLowerCase().includes(filterQuery) ||
+               (b.logNote || '').toLowerCase().includes(filterQuery);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <p>No active traffic restriction filters match the current console view.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(ban => {
+        const item = document.createElement('div');
+        item.className = 'ledger-item';
+        item.innerHTML = `
+          <div class="ledger-identity">
+            <div class="ledger-icon-wrap" style="background: rgba(255, 159, 10, 0.12); border: 1px solid rgba(255, 159, 10, 0.25); color: var(--color-orange);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <div class="ledger-details">
+              <div class="ledger-name text-white" title="${ban.filterKey}">${ban.filterKey}</div>
+              <div class="ledger-meta">${ban.filterType.toUpperCase()} RESTRICTION</div>
+            </div>
+          </div>
+          <div class="ledger-operator">N/A</div>
+          <div class="ledger-gateway" style="color: var(--color-text-muted); font-size: 0.75rem;">${ban.logNote || 'No description'}</div>
+          <div class="ledger-time">${getRelativeTime(ban.createdAt)}</div>
+          <div class="ledger-status">
+            <span class="status-revoked-badge" style="background: rgba(255, 159, 10, 0.15); border-color: rgba(255, 159, 10, 0.25); color: var(--color-orange);">ACTIVE BAN</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleBanForm() {
+      const container = document.getElementById('ban-form-container');
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        document.getElementById('ban-filter-key').focus();
+      }
+    }
+
+    async function submitBan(e) {
+      e.preventDefault();
+      const filterKey = document.getElementById('ban-filter-key').value.trim();
+      const filterType = document.getElementById('ban-filter-type').value;
+      const logNote = document.getElementById('ban-log-note').value.trim() || 'Restricted via Operations Console';
+
+      if (!filterKey) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/sessions/ban`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filterKey, filterType, logNote })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showBannerNotice(`Permanent restriction filter applied: ${filterKey}`);
+          document.getElementById('ban-form').reset();
+          toggleBanForm();
+          await fetchData();
+          if (activeTab === 'traffic') {
+            await fetchBans();
+          }
+        } else {
+          alert(data.msg || "Failed to deploy traffic filter.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      }
+    }
+
+    async function banUser(userId, ipAddress) {
+      const option = confirm(`Deploy permanent restriction for this entity?\n\nClick "OK" to ban by IP Address (${ipAddress}).\nClick "Cancel" to ban by User Account ID (${userId}).`);
+      
+      const filterKey = option ? ipAddress : userId;
+      const filterType = option ? 'ip' : 'user';
+      const logNote = prompt("Provide operational reason for this permanent ban:", "Suspicious activity detected via Cockpit Console");
+      
+      if (logNote === null) return; // cancelled
+
+      try {
+        const res = await fetch(`${API_BASE}/sessions/ban`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filterKey, filterType, logNote })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showBannerNotice(`Permanent restriction deployed: ${filterKey}`);
+          await fetchData();
+          if (activeTab === 'traffic') {
+            await fetchBans();
+          }
+        } else {
+          alert(data.msg || "Failed to apply restriction.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      }
+    }
+
+    async function purgeUser(userId, role) {
+      if (!confirm(`⚠️ CRITICAL SECURITY WARNING ⚠️\n\nYou are about to permanently delete this user account (${userId}) from the database!\n\nThis will purge all user records, login profiles, and permanently terminate all current and future sessions.\n\nTHIS ACTION CANNOT BE UNDONE.\n\nAre you absolutely sure?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/sessions/purge/${userId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showBannerNotice("User account and storage purged successfully.");
+          await fetchData();
+        } else {
+          alert(data.msg || "Failed to purge user storage.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      }
+    }
+
+    async function terminateSession(sessionId) {
+      if (!confirm("Are you sure you want to immediately terminate this session? The user will be instantly logged out and forced back to the authentication screen.")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/sessions/revoke/${sessionId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: "Manually blacklisted from Session Intelligence Panel" })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          showBannerNotice("Session successfully terminated and token blacklisted.");
+          await fetchData();
+        } else {
+          alert(data.msg || "Failed to terminate session.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      }
+    }
+
+    async function terminateAllSessions() {
+      if (!confirm("⚠️ DANGER AREA ⚠️\nAre you sure you want to terminate and blacklist EVERY active session in the portal? This will log out all administrators, institutes, and students instantly.")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/sessions/revoke-all`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          showBannerNotice(data.msg || "All sessions revoked successfully.");
+          await fetchData();
+        } else {
+          alert(data.msg || "Failed to complete global revoke.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed.");
+      }
+    }
+
+    // Helper to calculate human readable time duration
+    function getRelativeTime(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      let interval = Math.floor(seconds / 31536000);
+      if (interval >= 1) return interval + "y ago";
+      
+      interval = Math.floor(seconds / 2592000);
+      if (interval >= 1) return interval + "mo ago";
+      
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) return interval + "d ago";
+      
+      interval = Math.floor(seconds / 3600);
+      if (interval >= 1) return interval + "h ago";
+      
+      interval = Math.floor(seconds / 60);
+      if (interval >= 1) return interval + "m ago";
+      
+      return seconds < 5 ? "Just now" : seconds + "s ago";
+    }
+  </script>
+</body>
+</html>
