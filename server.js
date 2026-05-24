@@ -6,7 +6,7 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 5002;
 const SECRET = process.env.SESSION_MANAGER_SECRET || "7xTN5aqUwWGzhDJs";
-const BACKEND_BASE = process.env.BACKEND_API_BASE || "http://localhost:5000/api";
+const BACKEND_BASE = process.env.BACKEND_API_BASE || "https://backend-techmnhub-ejf5.onrender.com/api";
 
 // Enable CORS & JSON parsing
 app.use(cors());
