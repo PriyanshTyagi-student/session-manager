@@ -176,6 +176,60 @@
       display: flex;
       gap: 1rem;
       align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .backend-switcher {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 16px;
+      border: 1px solid var(--border-cyber);
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+    }
+
+    .backend-switcher-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .backend-status {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+      letter-spacing: 0.2px;
+      padding-left: 0.25rem;
+    }
+
+    .backend-switcher select,
+    .backend-switcher input {
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.6rem 0.75rem;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .backend-switcher input {
+      min-width: 280px;
+    }
+
+    .backend-switcher button {
+      border-radius: 10px;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--color-gold);
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
     }
 
     .btn-global-reset {
@@ -794,6 +848,19 @@
       </div>
       
       <div class="header-actions">
+        <div class="backend-switcher-wrap">
+          <div class="backend-switcher" title="Switch session dashboard backend">
+            <select id="backendModeSelect" onchange="onBackendModeChange(this)">
+              <option value="auto">Auto</option>
+              <option value="local">Local</option>
+              <option value="deployed">Deployed</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input id="backendUrlInput" type="text" placeholder="https://your-backend.example.com" oninput="updateBackendStatus({ syncControls: false })">
+            <button type="button" onclick="applyBackendConfig()">Apply</button>
+          </div>
+          <div id="backendStatus" class="backend-status"></div>
+        </div>
         <button type="button" class="btn-global-reset" onclick="terminateAllSessions()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -897,6 +964,8 @@
           <button type="button" class="tab-btn active" id="tab-active" onclick="switchTab('active')">Active Sessions</button>
           <button type="button" class="tab-btn" id="tab-ledger" onclick="switchTab('ledger')">Revocation Ledger</button>
           <button type="button" class="tab-btn" id="tab-traffic" onclick="switchTab('traffic')">Traffic Controls</button>
+          <button type="button" class="tab-btn" id="tab-security" onclick="switchTab('security')">Security & Activity</button>
+          <button type="button" class="tab-btn" id="tab-credentials" onclick="switchTab('credentials')">Employee Passwords</button>
         </div>
       </div>
 
@@ -978,6 +1047,98 @@
         </div>
       </div>
 
+      <!-- Security & Activity Panel -->
+      <div id="security-terminal" class="tab-content" style="display: none;">
+        <div class="ledger-wrapper">
+          <div class="ledger-header">
+            <h2 class="ledger-title">Security Events</h2>
+            <span style="color: var(--color-gold); background: rgba(212,175,55,0.08); padding: 4px 10px; border: 1px solid rgba(212,175,55,0.15); border-radius: 6px; font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Blocked Attempts & Activity</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="min-height: 220px;">
+              <h3 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--color-orange); margin-bottom: 0.75rem;">Blocked / Failed Logins</h3>
+              <div id="blocked-attempts-container" class="ledger-scroll" style="max-height: 420px; overflow-y: auto;"></div>
+            </div>
+
+            <div style="min-height: 220px;">
+              <h3 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--color-cyan); margin-bottom: 0.75rem;">Activity Feed</h3>
+              <div id="activity-feed-container" class="ledger-scroll" style="max-height: 420px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employee Password Panel -->
+      <div id="credentials-terminal" class="tab-content" style="display: none;">
+        <div class="ledger-wrapper">
+          <div class="ledger-header">
+            <h2 class="ledger-title" style="background: linear-gradient(135deg, #ffffff 0%, var(--color-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Employee Passwords</h2>
+            <span style="color: var(--color-cyan); background: rgba(0,229,255,0.08); padding: 4px 10px; border: 1px solid rgba(0,229,255,0.15); border-radius: 6px; font-family: var(--font-display); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Create / Reset</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1rem; align-items: start;">
+            <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 1rem;">
+              <h3 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--color-cyan); margin-bottom: 0.85rem;">Issue / Reset Employee Password</h3>
+              <form id="employee-password-form" onsubmit="submitEmployeeCredentials(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem; align-items: end;">
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Employee ID</label>
+                  <input type="text" id="employee-pass-empid" required placeholder="EMP-001" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Password (optional)</label>
+                  <input type="text" id="employee-pass-password" placeholder="Leave blank to auto-generate" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Mode</label>
+                  <select id="employee-pass-mode" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                    <option value="issue">Issue / Reset One Employee</option>
+                    <option value="backfill">Backfill Missing Credentials</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Email Employee</label>
+                  <select id="employee-pass-send-email" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                    <option value="true">Yes, email credentials</option>
+                    <option value="false">No email</option>
+                  </select>
+                </div>
+                <div style="grid-column: 1 / -1; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="submit" class="btn-global-reset" style="background: linear-gradient(135deg, var(--color-cyan) 0%, #00A5B7 100%); border-color: rgba(0,229,255,0.25); box-shadow: 0 4px 15px rgba(0,229,255,0.18);">Issue Employee Password</button>
+                  <button type="button" class="tab-btn" onclick="fillAutoPassword()">Auto-generate</button>
+                </div>
+              </form>
+              <div style="margin-top: 0.85rem; color: var(--color-text-muted); font-size: 0.78rem; line-height: 1.5;">
+                This sends the exact password you type to one employee. Leave it blank to auto-generate only for that employee. Use backfill only for missing credentials.
+              </div>
+            </div>
+
+            <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 1rem;">
+              <h3 style="font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--color-gold); margin-bottom: 0.85rem;">Admin Sign-In</h3>
+              <div style="display: grid; gap: 0.75rem;">
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Admin Employee ID</label>
+                  <input type="text" id="employee-admin-empid" placeholder="EMP-001" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Admin Password</label>
+                  <input type="password" id="employee-admin-password" placeholder="Admin password" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                </div>
+                <div>
+                  <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-text-muted); font-weight: 700; display: block; margin-bottom: 6px;">Operator Name</label>
+                  <input type="text" id="employee-admin-operator" placeholder="System Admin" style="width: 100%; background: rgba(0,0,0,0.6); border: 1px solid var(--border-cyber); color: #ffffff; padding: 0.6rem 0.8rem; border-radius: 8px; font-size: 0.8rem; outline: none; font-family: var(--font-body);">
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="tab-btn active" onclick="loginAdminForEmployeeActions()" style="background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.25); color: var(--color-gold);">Sign In</button>
+                  <button type="button" class="tab-btn" onclick="clearEmployeeAdminSession()">Clear</button>
+                </div>
+                <div id="employee-admin-status" style="font-size: 0.75rem; color: var(--color-text-muted); line-height: 1.4;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -988,10 +1149,220 @@
     let historySessions = [];
     let activeBans = [];
     let filterQuery = '';
-    const API_BASE = window.SESSION_API_BASE || 'https://techmnhub-backend-ejf5.onrender.com/api';
+    let employeeAdminToken = '';
+    const SESSION_BACKEND_STORAGE_KEY = 'sessionDashboardBackendUrl';
+    const SESSION_BACKEND_MODE_KEY = 'sessionDashboardBackendMode';
+    const EMPLOYEE_ADMIN_TOKEN_KEY = 'sessionDashboardEmployeeAdminToken';
+    const LOCAL_BACKEND_URL = 'http://localhost:5000/api';
+    const DEPLOYED_BACKEND_URL = 'https://techmnhub-backend-ejf5.onrender.com/api';
+
+    function getDefaultBackendUrl() {
+      return window.location.hostname === 'localhost' ? LOCAL_BACKEND_URL : DEPLOYED_BACKEND_URL;
+    }
+
+    function normalizeBackendUrl(value) {
+      return String(value || '').trim().replace(/\/+$/, '');
+    }
+
+    function getStoredBackendConfig() {
+      var mode = 'auto';
+      var url = '';
+      var injected = normalizeBackendUrl(window.SESSION_API_BASE || '');
+      try {
+        mode = localStorage.getItem(SESSION_BACKEND_MODE_KEY) || 'auto';
+        url = localStorage.getItem(SESSION_BACKEND_STORAGE_KEY) || '';
+      } catch (e) { /* ignore */ }
+
+      if (mode === 'local') url = LOCAL_BACKEND_URL;
+      else if (mode === 'deployed') url = DEPLOYED_BACKEND_URL;
+      else if (mode === 'auto' || !url) url = injected || getDefaultBackendUrl();
+
+      return {
+        mode: ['auto', 'local', 'deployed', 'custom'].includes(mode) ? mode : 'auto',
+        url: normalizeBackendUrl(url) || getDefaultBackendUrl(),
+      };
+    }
+
+    function loadEmployeeAdminToken() {
+      try {
+        return localStorage.getItem(EMPLOYEE_ADMIN_TOKEN_KEY) || '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function saveEmployeeAdminToken(token) {
+      employeeAdminToken = String(token || '').trim();
+      try {
+        if (employeeAdminToken) {
+          localStorage.setItem(EMPLOYEE_ADMIN_TOKEN_KEY, employeeAdminToken);
+        } else {
+          localStorage.removeItem(EMPLOYEE_ADMIN_TOKEN_KEY);
+        }
+      } catch (e) { /* ignore */ }
+      updateEmployeeAdminStatus();
+    }
+
+    function clearEmployeeAdminSession() {
+      employeeAdminToken = '';
+      try {
+        localStorage.removeItem(EMPLOYEE_ADMIN_TOKEN_KEY);
+      } catch (e) { /* ignore */ }
+      updateEmployeeAdminStatus();
+      showBannerNotice('Admin session cleared.');
+    }
+
+    function updateEmployeeAdminStatus() {
+      const statusEl = document.getElementById('employee-admin-status');
+      if (!statusEl) return;
+      statusEl.textContent = employeeAdminToken
+        ? 'Admin session active. You can issue or backfill employee passwords.'
+        : 'Sign in with admin Employee ID and password to enable employee password actions.';
+    }
+
+    function getEmployeeAdminAuthHeaders() {
+      return employeeAdminToken ? { Authorization: `Bearer ${employeeAdminToken}` } : {};
+    }
+
+    function fillAutoPassword() {
+      const field = document.getElementById('employee-pass-password');
+      if (field) field.value = '';
+      showBannerNotice('Password will be auto-generated when you submit.');
+    }
+
+    async function loginAdminForEmployeeActions() {
+      const empId = document.getElementById('employee-admin-empid').value.trim();
+      const password = document.getElementById('employee-admin-password').value;
+      const operatorName = document.getElementById('employee-admin-operator').value.trim() || 'System Admin';
+
+      if (!empId || !password) {
+        alert('Enter admin Employee ID and password first.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ empId, password, operatorName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.msg || 'Admin login failed.');
+          return;
+        }
+
+        saveEmployeeAdminToken(data.token || '');
+        showBannerNotice('Admin sign-in successful.');
+      } catch (err) {
+        console.error(err);
+        alert('Server connection failed.');
+      }
+    }
+
+    let API_BASE = getStoredBackendConfig().url;
+
+    function updateBackendStatus(opts) {
+      opts = opts || {};
+      var syncControls = opts.syncControls !== false;
+      var modeEl = document.getElementById('backendModeSelect');
+      var inputEl = document.getElementById('backendUrlInput');
+      if (!modeEl || !inputEl) return;
+
+      var config = getStoredBackendConfig();
+      if (syncControls) {
+        modeEl.value = config.mode;
+        inputEl.value = config.url;
+        inputEl.disabled = config.mode !== 'custom';
+      }
+
+      var activeMode = syncControls ? config.mode : (modeEl.value || config.mode);
+      var activeUrl = syncControls ? API_BASE : (normalizeBackendUrl(inputEl.value) || API_BASE);
+      var statusEl = document.getElementById('backendStatus');
+      if (statusEl) {
+        statusEl.textContent = 'Backend: ' + activeMode + ' → ' + activeUrl;
+      }
+    }
+
+    function persistBackendConfig(mode, url) {
+      try {
+        localStorage.setItem(SESSION_BACKEND_MODE_KEY, mode);
+        if (mode === 'custom') {
+          localStorage.setItem(SESSION_BACKEND_STORAGE_KEY, url);
+        } else {
+          localStorage.removeItem(SESSION_BACKEND_STORAGE_KEY);
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    function setBackendUrl(nextUrl, mode) {
+      var normalized = normalizeBackendUrl(nextUrl);
+      if (!normalized) {
+        alert('Please enter a valid backend URL.');
+        return false;
+      }
+
+      API_BASE = normalized;
+      persistBackendConfig(mode || 'custom', normalized);
+      updateBackendStatus();
+      fetchData();
+      return true;
+    }
+
+    function onBackendModeChange(sel) {
+      var input = document.getElementById('backendUrlInput');
+      if (!input) return;
+
+      if (sel.value === 'local') {
+        input.value = LOCAL_BACKEND_URL;
+        input.disabled = true;
+      } else if (sel.value === 'deployed') {
+        input.value = DEPLOYED_BACKEND_URL;
+        input.disabled = true;
+      } else if (sel.value === 'auto') {
+        input.value = getDefaultBackendUrl();
+        input.disabled = true;
+      } else {
+        input.disabled = false;
+        if (!input.value) input.value = API_BASE;
+      }
+
+      updateBackendStatus({ syncControls: false });
+    }
+
+    function applyBackendConfig() {
+      var mode = document.getElementById('backendModeSelect').value || 'custom';
+      var input = document.getElementById('backendUrlInput');
+      var nextUrl = mode === 'local'
+        ? LOCAL_BACKEND_URL
+        : mode === 'deployed'
+          ? DEPLOYED_BACKEND_URL
+          : mode === 'auto'
+            ? getDefaultBackendUrl()
+            : input.value;
+
+      return setBackendUrl(nextUrl, mode);
+    }
+
+    function useLocalBackend() {
+      document.getElementById('backendModeSelect').value = 'local';
+      document.getElementById('backendUrlInput').value = LOCAL_BACKEND_URL;
+      document.getElementById('backendUrlInput').disabled = true;
+      return setBackendUrl(LOCAL_BACKEND_URL, 'local');
+    }
+
+    function useDeployedBackend() {
+      document.getElementById('backendModeSelect').value = 'deployed';
+      document.getElementById('backendUrlInput').value = DEPLOYED_BACKEND_URL;
+      document.getElementById('backendUrlInput').disabled = true;
+      return setBackendUrl(DEPLOYED_BACKEND_URL, 'deployed');
+    }
 
     // Automatic polling loop
     window.addEventListener('DOMContentLoaded', () => {
+      updateBackendStatus();
+      employeeAdminToken = loadEmployeeAdminToken();
+      updateEmployeeAdminStatus();
       fetchData();
       setInterval(fetchData, 4500); // 4.5 seconds live polling
     });
@@ -1005,12 +1376,17 @@
 
         if (activeTab === 'traffic') {
           fetchPromises.push(fetch(`${API_BASE}/sessions/bans`).then(r => r.json()));
+        } else if (activeTab === 'security') {
+          fetchPromises.push(fetch(`${API_BASE}/sessions/blocked`).then(r => r.json()));
+          fetchPromises.push(fetch(`${API_BASE}/sessions/activities`).then(r => r.json()));
         }
 
         const results = await Promise.all(fetchPromises);
         const liveRes = results[0];
         const historyRes = results[1];
-        const bansRes = results[2];
+        const bansRes = activeTab === 'traffic' ? results[2] : null;
+        const blockedRes = activeTab === 'security' ? results[2] : null;
+        const activitiesRes = activeTab === 'security' ? results[3] : null;
 
         if (liveRes && liveRes.ok) {
           liveSessions = liveRes.sessions || [];
@@ -1032,6 +1408,14 @@
           if (activeTab === 'traffic') {
             renderBansList();
           }
+        }
+
+        if (blockedRes && blockedRes.ok) {
+          renderBlockedAttempts(blockedRes.items || []);
+        }
+
+        if (activitiesRes && activitiesRes.ok) {
+          renderActivities(activitiesRes.activities || []);
         }
       } catch (err) {
         console.error("Presence API connection error:", err);
@@ -1063,10 +1447,14 @@
       document.getElementById('tab-active').classList.toggle('active', tabKey === 'active');
       document.getElementById('tab-ledger').classList.toggle('active', tabKey === 'ledger');
       document.getElementById('tab-traffic').classList.toggle('active', tabKey === 'traffic');
+      if (document.getElementById('tab-security')) document.getElementById('tab-security').classList.toggle('active', tabKey === 'security');
+      if (document.getElementById('tab-credentials')) document.getElementById('tab-credentials').classList.toggle('active', tabKey === 'credentials');
       
       document.getElementById('live-terminal').style.display = tabKey === 'active' ? 'block' : 'none';
       document.getElementById('ledger-terminal').style.display = tabKey === 'ledger' ? 'block' : 'none';
       document.getElementById('traffic-terminal').style.display = tabKey === 'traffic' ? 'block' : 'none';
+      document.getElementById('security-terminal').style.display = tabKey === 'security' ? 'block' : 'none';
+      document.getElementById('credentials-terminal').style.display = tabKey === 'credentials' ? 'block' : 'none';
 
       if (tabKey === 'active') {
         renderActiveSessions();
@@ -1074,6 +1462,11 @@
         renderHistoryLedger();
       } else if (tabKey === 'traffic') {
         await fetchBans();
+      } else if (tabKey === 'security') {
+        await fetchBlockedAttempts();
+        await fetchActivities();
+      } else if (tabKey === 'credentials') {
+        updateEmployeeAdminStatus();
       }
     }
 
@@ -1090,11 +1483,90 @@
       }
     }
 
+    async function fetchBlockedAttempts() {
+      try {
+        const res = await fetch(`${API_BASE}/sessions/blocked`);
+        const data = await res.json();
+        if (res.ok) {
+          renderBlockedAttempts(data.items || []);
+        }
+      } catch (err) {
+        console.error('Failed to load blocked attempts', err);
+      }
+    }
+
+    async function fetchActivities() {
+      try {
+        const res = await fetch(`${API_BASE}/sessions/activities`);
+        const data = await res.json();
+        if (res.ok) {
+          renderActivities(data.activities || []);
+        }
+      } catch (err) {
+        console.error('Failed to load activities', err);
+      }
+    }
+
+    async function submitEmployeeCredentials(event) {
+      event.preventDefault();
+
+      const mode = document.getElementById('employee-pass-mode').value;
+      const empId = document.getElementById('employee-pass-empid').value.trim();
+      const password = document.getElementById('employee-pass-password').value.trim();
+      const sendEmail = document.getElementById('employee-pass-send-email').value === 'true';
+
+      if (!employeeAdminToken) {
+        alert('Sign in with admin credentials first.');
+        return;
+      }
+
+      try {
+        const url = mode === 'backfill'
+          ? `${API_BASE}/admin/employees/backfill-credentials`
+          : `${API_BASE}/admin/employees/${encodeURIComponent(empId)}/credentials`;
+
+        const payload = mode === 'backfill'
+          ? { sendEmail, limit: 500 }
+          : { empId, password, manualPassword: password, autoGeneratePassword: !password, sendEmail };
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getEmployeeAdminAuthHeaders(),
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert(data.msg || 'Failed to create employee credentials.');
+          return;
+        }
+
+        const message = mode === 'backfill'
+          ? `Backfilled credentials for ${data.processed || 0} employees.`
+          : `Credentials issued for ${data.employee?.empId || empId}.`;
+
+        showBannerNotice(message);
+        document.getElementById('employee-password-form').reset();
+        document.getElementById('employee-pass-send-email').value = 'true';
+      } catch (err) {
+        console.error(err);
+        alert('Server connection failed.');
+      }
+    }
+
     function handleSearch() {
       filterQuery = document.getElementById('search-input').value.toLowerCase().trim();
       if (activeTab === 'active') renderActiveSessions();
       else if (activeTab === 'ledger') renderHistoryLedger();
       else if (activeTab === 'traffic') renderBansList();
+      else if (activeTab === 'security') {
+        // local searches apply to both lists
+        fetchBlockedAttempts();
+        fetchActivities();
+      }
     }
 
     function showBannerNotice(message) {
@@ -1464,6 +1936,68 @@
       if (isHidden) {
         document.getElementById('ban-filter-key').focus();
       }
+    }
+
+    function renderBlockedAttempts(items) {
+      const container = document.getElementById('blocked-attempts-container');
+      container.innerHTML = '';
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="empty-state"><p>No blocked or failed login attempts in the last 24 hours.</p></div>`;
+        return;
+      }
+
+      items.forEach(entry => {
+        const item = document.createElement('div');
+        item.className = 'ledger-item';
+        const actor = entry.actorUserId || 'unknown';
+        const reason = entry.metadata && (entry.metadata.reason || entry.action) ? (entry.metadata.reason || entry.action) : entry.action;
+        item.innerHTML = `
+          <div class="ledger-identity">
+            <div class="ledger-icon-wrap" style="background: rgba(255,59,48,0.08); border: 1px solid rgba(255,59,48,0.12); color: #FF3B30;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="ledger-details">
+              <div class="ledger-name text-white" title="${actor}">${actor}</div>
+              <div class="ledger-meta">${(entry.actorRole || '').toUpperCase()} • ${reason}</div>
+            </div>
+          </div>
+          <div class="ledger-operator">${entry.metadata && entry.metadata.deviceLabel ? entry.metadata.deviceLabel : 'N/A'}</div>
+          <div class="ledger-gateway" style="font-family: monospace;">${entry.ipAddress || 'N/A'}</div>
+          <div class="ledger-time">${getRelativeTime(entry.createdAt)}</div>
+          <div class="ledger-status"><span class="status-revoked-badge">${entry.action}</span></div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderActivities(items) {
+      const container = document.getElementById('activity-feed-container');
+      container.innerHTML = '';
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="empty-state"><p>No recent activity.</p></div>`;
+        return;
+      }
+
+      items.forEach(evt => {
+        const el = document.createElement('div');
+        el.className = 'ledger-item';
+        el.innerHTML = `
+          <div class="ledger-identity">
+            <div class="ledger-icon-wrap" style="background: rgba(0,229,255,0.06); border: 1px solid rgba(0,229,255,0.12); color: var(--color-cyan);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M2 12h20"/></svg>
+            </div>
+            <div class="ledger-details">
+              <div class="ledger-name text-white" title="${evt.actorUserId}">${evt.actorUserId}</div>
+              <div class="ledger-meta">${(evt.action || '').toUpperCase()} • ${evt.actorRole || ''}</div>
+            </div>
+          </div>
+          <div class="ledger-operator">${evt.metadata && evt.metadata.operatorName ? evt.metadata.operatorName : 'N/A'}</div>
+          <div class="ledger-gateway" style="font-size: 0.75rem; color: var(--color-text-muted);">${evt.ipAddress || ''} ${evt.userAgent ? '• ' + evt.userAgent : ''}</div>
+          <div class="ledger-time">${getRelativeTime(evt.createdAt)}</div>
+          <div class="ledger-status">${evt.action === 'login_success' ? '<span class="status-expired-badge">OK</span>' : '<span class="status-revoked-badge">EVENT</span>'}</div>
+        `;
+        container.appendChild(el);
+      });
     }
 
     async function submitBan(e) {
